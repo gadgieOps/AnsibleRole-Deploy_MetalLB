@@ -1,0 +1,7 @@
+---
+version: "0.13.7"
+manifest_url: https://raw.githubusercontent.com/metallb/metallb/v{{ version }}/config/manifests/metallb-native.yaml
+
+manifest_download_dir: /etc/kubernetes/additional-manifests
+
+ipvs: true

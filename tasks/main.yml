@@ -1,0 +1,55 @@
+---
+
+###
+# Installs the metallb LoadBalancer. 
+# Allows us to expose a virtual IP to the host network in the same way as we would on a CSP
+# https://metallb.universe.tf/concepts/
+#
+
+- name: Enable IPVS mode
+  block:
+
+  - name: Get kube-proxy config map
+    shell: kubectl get configmap/kube-proxy -n kube-system -o yaml > /home/{{ ansible_user }}/kube-proxy.yml
+    become: false
+
+  - name: Set strictARP to true
+    lineinfile:
+      path: /home/{{ ansible_user }}/kube-proxy.yml
+      regexp: '      strictARP:'
+      line: '      strictARP: true'
+
+  - name: Set mode to ipvs
+    lineinfile:
+      path: /home/{{ ansible_user }}/kube-proxy.yml
+      regexp: '    mode:'
+      line: '    mode: "ipvs"'
+
+  - name: Deploy kube-proxy configuartion to the cluster
+    command: kubectl apply -f kube-proxy.yml 
+
+  - name: Remove kube-proxy.yml
+    file:
+      path: /home/{{ ansible_user }}/kube-proxy.yml
+      state: absent
+      
+  when: ipvs | bool
+
+- name: Create addons folder to store metallb manifest
+  file:
+    path: "{{ manifest_download_dir }}"
+    mode: "0755"
+    owner: "root"
+    group: "root"
+    state: directory
+
+- name: Download metallb manifest for reference
+  get_url:
+    url: "{{ manifest_url }}"
+    dest: "{{ manifest_download_dir }}/metallb.yml"
+    mode: "0664"
+    owner: "root"
+    group: "root"
+
+- name: Deploy metallb
+  command: kubectl apply -f "{{ manifest_url }}"
