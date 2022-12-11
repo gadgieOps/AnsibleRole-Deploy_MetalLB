@@ -6,6 +6,18 @@
 # https://metallb.universe.tf/concepts/
 #
 
+- name: Remove metallb
+  block:
+
+  - name: remove metallb
+    command: 
+      cmd: "kubectl delete -f {{ manifest_name }}"
+      chdir: "{{ manifest_download_dir }}"
+
+  - meta: end_play
+
+  when: remove | bool
+
 - name: Enable IPVS mode
   block:
 
@@ -46,10 +58,11 @@
 - name: Download metallb manifest for reference
   get_url:
     url: "{{ manifest_url }}"
-    dest: "{{ manifest_download_dir }}/metallb.yml"
+    dest: "{{ manifest_download_dir }}/{{ manifest_name }}"
     mode: "0664"
     owner: "root"
     group: "root"
 
 - name: Deploy metallb
   command: kubectl apply -f "{{ manifest_url }}"
+  when: not remove
