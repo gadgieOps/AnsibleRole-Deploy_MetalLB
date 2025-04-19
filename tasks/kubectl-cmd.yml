@@ -1,0 +1,17 @@
+---
+- name: Set strictARP in kube-proxy ConfigMap
+  ansible.builtin.command: |
+    kubectl get configmap kube-proxy -n kube-system -o yaml | \
+    sed "s/strictARP: {{ not strict_arp | lower }}/strictARP: {{ strict_arp | lower }}/" | \
+    kubectl apply -f - -n kube-system
+  become: false
+
+- name: remove metallb
+  ansible.builtin.command: 
+    cmd: "kubectl delete -f {{ manifest_name }}"
+    chdir: "{{ manifest_download_dir }}"
+  when: remove | bool
+
+- name: Deploy metallb
+  ansible.builtin.command: kubectl apply -f "{{ manifest_url }}"
+  when: not remove

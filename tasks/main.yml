@@ -6,19 +6,24 @@
 # https://metallb.universe.tf/concepts/
 #
 
-- name: remove metallb
-  ansible.builtin.command: 
-    cmd: "kubectl delete -f {{ manifest_name }}"
-    chdir: "{{ manifest_download_dir }}"
-  when: remove | bool
+- name: Ensure addons folder to store metallb manifest exists
+  ansible.builtin.file:
+    path: "{{ manifest_dir }}"
+    mode: "0755"
+    owner: "{{ manifest_dir_owner }}"
+    group: "{{ manifest_dir_group }}"
+    state: directory
+  when: download_manifest | bool
 
-- name: Set strictARP in kube-proxy ConfigMap
-  ansible.builtin.command: |
-    kubectl get configmap kube-proxy -n kube-system -o yaml | \
-    sed "s/strictARP: {{ not strict_arp | lower }}/strictARP: {{ strict_arp | lower }}/" | \
-    kubectl apply -f - -n kube-system
-  become: false
+- name: Download metallb manifest for reference
+  ansible.builtin.get_url:
+    url: "{{ manifest_url }}"
+    dest: "{{ manifest_dir }}/{{ manifest }}"
+    mode: "0644"
+    owner: "{{ manifest_owner }}"
+    group: "{{ manifest_group }}"
+  when: download_manifest | bool
 
-- name: Include install tasks
-  ansible.builtin.include_tasks: install-{{ install_method }}.yml
+- name: Include install_method tasks
+  ansible.builtin.include_tasks: "{{ install_method }}.yml"
   when: not remove | bool

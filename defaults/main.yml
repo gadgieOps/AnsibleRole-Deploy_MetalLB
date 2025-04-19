@@ -2,7 +2,12 @@
 version: "0.14.9"
 manifest_url: https://raw.githubusercontent.com/metallb/metallb/v{{ version }}/config/manifests/metallb-native.yaml
 
+# Insallation methods
+# kubectl-cmd: uses kubectl cli
+# kubectl: uses the community.kubernetes.k8s module
 install_method: kubectl-cmd
+
+kubeconfig_path: "{{ ansible_env.HOME }}/.kube/config"
 
 download_manifest: false
 manifest_dir: "{{ ansible_env.HOME }}/.kubernetes-manifests/metallb"
