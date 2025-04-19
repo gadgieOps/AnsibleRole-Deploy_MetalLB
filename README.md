@@ -10,23 +10,76 @@ ansible-galaxy install git+https://github.com/gadgieOps/AnsibleRole-Deploy_Metal
 
 ## Role Variables
 
-```bash
+```yaml
 version: "0.14.9"
 ```
 
-Version of MetalLB to deploy
+Version of MetalLB to deploy.
 
-```bash
+```yaml
+manifest_url: https://raw.githubusercontent.com/metallb/metallb/v{{ version }}/config/manifests/metallb-native.yaml
+```
+
+URL of the MetalLB manifest to deploy.
+
+```yaml
+install_method: kubectl
+```
+
+Installation method. Options are:
+
+- `kubectl-cmd`: Uses the `kubectl` CLI.
+- `kubectl`: Uses the `kubernetes.core` Ansible modules.
+
+```yaml
+state: present
+```
+
+State of the MetalLB deployment. Options are `present` (deploy) or `absent` (remove).
+
+```yaml
+kubeconfig_path: "{{ ansible_env.HOME }}/.kube/config"
+```
+
+Path to the Kubernetes kubeconfig file.
+
+```yaml
+download_manifest: false
+```
+
+Whether to download the MetalLB manifest locally.
+
+```yaml
+manifest_dir: "{{ ansible_env.HOME }}/.kubernetes-manifests/metallb"
+```
+
+Directory to store the downloaded manifest.
+
+```yaml
+manifest_dir_owner: "{{ ansible_env.USER }}"
+manifest_dir_group: "{{ ansible_env.USER }}"
+```
+
+Owner and group of the manifest directory.
+
+```yaml
+manifest: metallb.yml
+```
+
+Name of the manifest file.
+
+```yaml
+manifest_owner: "{{ ansible_env.USER }}"
+manifest_group: "{{ ansible_env.USER }}"
+```
+
+Owner and group of the manifest file.
+
+```yaml
 strict_arp: true
 ```
 
-Set if strict_arp is enabled in kube-proxy when using ipvs.
-
-```bash
-remove: false
-```
-
-Will remove MetalLB rather than deploy it when set to true
+Set if strict ARP is enabled in kube-proxy when using IPVS.
 
 ## Example Playbook
 
