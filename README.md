@@ -2,6 +2,12 @@
 
 Deploys MetalLB on a Kubernetes Cluster. Based on installation documentation as per: [MetalLB Installation](https://metallb.universe.tf/installation/)
 
+## Dependencies
+
+```bash
+ansible-galaxy -r install requirements.yml
+```
+
 ## Installation
 
 ```bash
