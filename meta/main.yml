@@ -1,10 +1,11 @@
+---
 galaxy_info:
   author: gadgieOps
   description: Adds metallb objects to a kubernetes control plane node
 
   license: MIT
 
-  min_ansible_version: 2.1
+  min_ansible_version: "2.1"
 
   galaxy_tags:
     - kubernetes

@@ -1,6 +1,6 @@
 ---
 - name: Load kube-proxy ConfigMap
-  community.kubernetes.k8s_info:
+  kubernetes.core.k8s_info:
     api_version: v1
     kind: ConfigMap
     name: kube-proxy
@@ -9,7 +9,7 @@
   register: kube_proxy_cm
 
 - name: Patch strictARP in kube-proxy ConfigMap
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: v1
@@ -19,18 +19,10 @@
         namespace: kube-system
       data:
         config.conf: "{{ kube_proxy_cm.resources[0].data['config.conf'] | regex_replace('strictARP: .*', 'strictARP: ' ~ strict_arp | lower) }}"
-      kubeconfig: "{{ kubeconfig_path }}"
+    kubeconfig: "{{ kubeconfig_path }}"
   when: kube_proxy_cm.resources[0].data['config.conf'] is defined
 
-- name: Remove MetalLB manifests
-  community.kubernetes.k8s:
-    state: absent
-    src: "{{ manifest_download_dir }}/{{ manifest_name }}"
-  when: remove | bool
-
-- name: Deploy MetalLB manifests
-  community.kubernetes.k8s:
-    state: present
+- name: Deploy or Remove MetalLB
+  kubernetes.core.k8s:
+    state: "{{ state }}"
     src: "{{ manifest_url }}"
-    kubeconfig: "{{ kubeconfig_path }}"
-  when: not remove

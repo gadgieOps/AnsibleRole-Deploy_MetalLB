@@ -4,8 +4,9 @@ manifest_url: https://raw.githubusercontent.com/metallb/metallb/v{{ version }}/c
 
 # Insallation methods
 # kubectl-cmd: uses kubectl cli
-# kubectl: uses the community.kubernetes.k8s module
-install_method: kubectl-cmd
+# kubectl: uses the kubernetes.core modules
+install_method: kubectl
+state: present
 
 kubeconfig_path: "{{ ansible_env.HOME }}/.kube/config"
 
@@ -18,4 +19,3 @@ manifest_owner: "{{ ansible_env.USER }}"
 manifest_group: "{{ ansible_env.USER }}"
 
 strict_arp: true
-remove: false

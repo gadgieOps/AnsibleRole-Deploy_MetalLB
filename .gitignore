@@ -1,5 +1,7 @@
 # Ansible specific files
 .ansible
+.playbooks/**
+.inventories/**
 *.retry
 *.log
 

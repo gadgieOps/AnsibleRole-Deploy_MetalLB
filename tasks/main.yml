@@ -1,7 +1,7 @@
 ---
 
 ###
-# Installs the metallb LoadBalancer. 
+# Installs the metallb LoadBalancer.
 # Allows us to expose a virtual IP to the host network in the same way as we would on a CSP
 # https://metallb.universe.tf/concepts/
 #
@@ -26,4 +26,3 @@
 
 - name: Include install_method tasks
   ansible.builtin.include_tasks: "{{ install_method }}.yml"
-  when: not remove | bool
