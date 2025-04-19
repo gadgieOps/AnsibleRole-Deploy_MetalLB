@@ -5,7 +5,7 @@ Deploys MetalLB on a Kubernetes Cluster. Based on installation documentation as 
 ## Installation
 
 ```bash
-ansible-galaxy install git+https://github.com/gadgieOps/AnsibleRole-Deploy_MetalLB.git
+ansible-galaxy install git+https://github.com/gadgieOps/deploy_MetalLB.git
 ```
 
 ## Role Variables
