@@ -6,63 +6,19 @@
 # https://metallb.universe.tf/concepts/
 #
 
-- name: Remove metallb
-  block:
-
-  - name: remove metallb
-    command: 
-      cmd: "kubectl delete -f {{ manifest_name }}"
-      chdir: "{{ manifest_download_dir }}"
-
-  - meta: end_play
-
+- name: remove metallb
+  ansible.builtin.command: 
+    cmd: "kubectl delete -f {{ manifest_name }}"
+    chdir: "{{ manifest_download_dir }}"
   when: remove | bool
 
-- name: Enable IPVS mode
-  block:
+- name: Set strictARP in kube-proxy ConfigMap
+  ansible.builtin.command: |
+    kubectl get configmap kube-proxy -n kube-system -o yaml | \
+    sed "s/strictARP: {{ not strict_arp | lower }}/strictARP: {{ strict_arp | lower }}/" | \
+    kubectl apply -f - -n kube-system
+  become: false
 
-  - name: Get kube-proxy config map
-    shell: kubectl get configmap/kube-proxy -n kube-system -o yaml > /home/{{ ansible_user }}/kube-proxy.yml
-    become: false
-
-  - name: Set strictARP to true
-    lineinfile:
-      path: /home/{{ ansible_user }}/kube-proxy.yml
-      regexp: '      strictARP:'
-      line: '      strictARP: true'
-
-  - name: Set mode to ipvs
-    lineinfile:
-      path: /home/{{ ansible_user }}/kube-proxy.yml
-      regexp: '    mode:'
-      line: '    mode: "ipvs"'
-
-  - name: Deploy kube-proxy configuartion to the cluster
-    command: kubectl apply -f kube-proxy.yml 
-
-  - name: Remove kube-proxy.yml
-    file:
-      path: /home/{{ ansible_user }}/kube-proxy.yml
-      state: absent
-      
-  when: ipvs | bool
-
-- name: Create addons folder to store metallb manifest
-  file:
-    path: "{{ manifest_download_dir }}"
-    mode: "0755"
-    owner: "root"
-    group: "root"
-    state: directory
-
-- name: Download metallb manifest for reference
-  get_url:
-    url: "{{ manifest_url }}"
-    dest: "{{ manifest_download_dir }}/{{ manifest_name }}"
-    mode: "0664"
-    owner: "root"
-    group: "root"
-
-- name: Deploy metallb
-  command: kubectl apply -f "{{ manifest_url }}"
-  when: not remove
+- name: Include install tasks
+  ansible.builtin.include_tasks: install-{{ install_method }}.yml
+  when: not remove | bool

@@ -1,30 +1,30 @@
-Ansible Role: Deploy metallb
-=========
+# Ansible Role: Deploy metallb
 
-Deploys metallb on a kubernetes control plane node. Based on installation documentation as per: https://metallb.universe.tf/installation/
+Deploys metallb on a kubernetes control plane node. Based on installation documentation as per: [MetalLB Installation](https://metallb.universe.tf/installation/)
 
+## Role Variables
 
-Role Variables
---------------
-
+~~~bash
+version: "0.14.9"
 ~~~
-version: "0.13.7"
-~~~
+
 Version of metallb to deploy
 
+~~~bash
+strict_arp: true
 ~~~
-ipvs: true
-~~~
-Set if ipvs is enabled in kube-proxy. (This will set strictArp: true)
 
-~~~
+Set if strict_arp is enabled in kube-proxy when using ipvs.
+
+~~~bash
 remove: false
 ~~~
+
 Will remove metallb rather than deploy it when set to true
 
-Example Playbook
-----------------
-~~~
+## Example Playbook
+
+~~~yaml
 - name: Deploy metallb
   hosts: control-plane-node
   become: true
@@ -32,12 +32,10 @@ Example Playbook
   - role: gadgieOps.metallb
 ~~~
 
-License
--------
+## License
 
 MIT
 
-Author Information
-------------------
+## Author Information
 
 Authored by gadgieOps

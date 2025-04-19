@@ -1,10 +1,16 @@
 ---
-version: "0.13.10"
+version: "0.14.9"
 manifest_url: https://raw.githubusercontent.com/metallb/metallb/v{{ version }}/config/manifests/metallb-native.yaml
 
-manifest_download_dir: /etc/kubernetes/additional-manifests
-manifest_name: metallb.yml
+install_method: kubectl-cmd
 
-ipvs: true
+download_manifest: false
+manifest_dir: "{{ ansible_env.HOME }}/.kubernetes-manifests/metallb"
+manifest_dir_owner: "{{ ansible_env.USER }}"
+manifest_dir_group: "{{ ansible_env.USER }}"
+manifest: metallb.yml
+manifest_owner: "{{ ansible_env.USER }}"
+manifest_group: "{{ ansible_env.USER }}"
 
+strict_arp: true
 remove: false

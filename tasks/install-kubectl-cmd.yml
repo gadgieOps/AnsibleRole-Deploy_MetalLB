@@ -1,0 +1,22 @@
+---
+- name: Ensure addons folder to store metallb manifest exists
+  ansible.builtin.file:
+    path: "{{ manifest_dir }}"
+    mode: "0755"
+    owner: "{{ manifest_dir_owner }}"
+    group: "{{ manifest_dir_group }}"
+    state: directory
+  when: download_manifest | bool
+
+- name: Download metallb manifest for reference
+  ansible.builtin.get_url:
+    url: "{{ manifest_url }}"
+    dest: "{{ manifest_dir }}/{{ manifest }}"
+    mode: "0644"
+    owner: "{{ manifest_owner }}"
+    group: "{{ manifest_group }}"
+  when: download_manifest | bool
+
+- name: Deploy metallb
+  ansible.builtin.command: kubectl apply -f "{{ manifest_url }}"
+  when: not remove
