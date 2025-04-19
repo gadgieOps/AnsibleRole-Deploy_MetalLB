@@ -6,6 +6,9 @@
 # https://metallb.universe.tf/concepts/
 #
 
+- name: Include asserts
+  ansible.builtin.include_tasks: asserts.yml
+
 - name: Ensure addons folder to store metallb manifest exists
   ansible.builtin.file:
     path: "{{ manifest_dir }}"

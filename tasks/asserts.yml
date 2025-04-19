@@ -1,0 +1,6 @@
+---
+- name: Assert that state is either present or absent
+  assert:
+    that:
+      - state in ['present', 'absent']
+    fail_msg: "The state must be either 'present' or 'absent'."
