@@ -18,7 +18,16 @@
         name: kube-proxy
         namespace: kube-system
       data:
-        config.conf: "{{ kube_proxy_cm.resources[0].data['config.conf'] | regex_replace('strictARP: .*', 'strictARP: ' ~ strict_arp | lower) }}"
+        config.conf: >-
+          {{
+            transformed_config
+          }}
+  vars:
+    transformed_config: >-
+      {{
+        kube_proxy_cm.resources[0].data['config.conf']
+        | regex_replace('strictARP: .*', 'strictARP: ' ~ strict_arp | lower)
+      }}
     kubeconfig: "{{ kubeconfig_path }}"
   when: kube_proxy_cm.resources[0].data['config.conf'] is defined
 
