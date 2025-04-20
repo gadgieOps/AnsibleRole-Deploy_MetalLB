@@ -4,13 +4,32 @@
     kubectl get configmap kube-proxy -n kube-system -o yaml | \
     sed "s/strictARP: {{ not strict_arp | lower }}/strictARP: {{ strict_arp | lower }}/" | \
     kubectl apply -f - -n kube-system
+  register: kube_proxy_configmap
+  changed_when: "'patched' in kube_proxy_configmap.stdout"
+  failed_when: kube_proxy_configmap.rc != 0
   become: false
 
-- name: remove metallb
-  ansible.builtin.command: 
+- name: Check if metallb is running
+  ansible.builtin.shell: |
+    kubectl get pods -n metallb-system --no-headers | grep -q Running
+  register: metallb_status
+  changed_when: false
+  failed_when: false
+
+- name: Remove metallb
+  ansible.builtin.command:
     cmd: "kubectl delete -f {{ manifest_url }}"
-  when: state == "absent"
+  register: delete_result
+  changed_when: "'deleted' in delete_result.stdout"
+  failed_when: delete_result.rc != 0
+  when: 
+    - state == "absent"
+    - metallb_status.rc == 0
 
 - name: Deploy metallb
-  ansible.builtin.command: kubectl apply -f "{{ manifest_url }}"
+  ansible.builtin.command:
+    cmd: "kubectl apply -f {{ manifest_url }}"
+  register: apply_result
+  changed_when: "'created' in apply_result.stdout"
+  failed_when: apply_result.rc != 0
   when: state == "present"
